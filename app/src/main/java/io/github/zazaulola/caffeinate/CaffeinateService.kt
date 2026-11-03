@@ -46,6 +46,21 @@ class CaffeinateService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val expire = Runnable { stopSelf() }
 
+    /**
+     * Плитка объявлена активной (ACTIVE_TILE): SystemUI привязывает её только по запросу,
+     * зато запрос поднимает её приоритет над остальными плитками. Пока таймер идёт и
+     * экран включён, запрашиваем обновление раз в секунду.
+     */
+    private val tileTick = object : Runnable {
+        override fun run() {
+            val st = CaffeinateState
+            if (!st.active || st.isInfinite) return
+            if (getSystemService(PowerManager::class.java).isInteractive) refreshTile()
+            val delay = (st.remainingMs() % 1000).let { if (it < 50) 1000 else it }
+            handler.postDelayed(this, delay)
+        }
+    }
+
     private var cpuLock: PowerManager.WakeLock? = null
     private var screenLock: PowerManager.WakeLock? = null
 
@@ -133,11 +148,14 @@ class CaffeinateService : Service() {
         if (!st.isInfinite) handler.postDelayed(expire, remaining)
 
         Bridge.publish(this)
+        handler.removeCallbacks(tileTick)
+        handler.post(tileTick)
         refreshTile()
     }
 
     override fun onDestroy() {
         handler.removeCallbacks(expire)
+        handler.removeCallbacks(tileTick)
         screenLock?.releaseSafely()
         cpuLock?.releaseSafely()
         reenableKeyguardFallback()

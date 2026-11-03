@@ -75,6 +75,12 @@
             <meta-data
                 android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true" />
+            <!-- Активная плитка: обновления запрашивает сервис таймера каждую секунду.
+                 Иначе SystemUI держит привязанными только 3 сервиса плиток и
+                 по очереди отвязывает остальные, и время на плитке замирает. -->
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
         </service>
 
         <!-- SystemUI-хук при старте спрашивает текущее состояние. -->
