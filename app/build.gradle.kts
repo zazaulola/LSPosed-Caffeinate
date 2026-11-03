@@ -15,6 +15,17 @@ android {
         versionName = "0.1.0"
     }
 
+    signingConfigs {
+        // Общий debug-ключ из репозитория, чтобы каждая сборка CI ставилась поверх
+        // предыдущей. Для debug-сборок это нормально: ключ не секретный.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildFeatures {
         buildConfig = true
     }
