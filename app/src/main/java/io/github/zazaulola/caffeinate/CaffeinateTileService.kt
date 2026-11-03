@@ -14,17 +14,26 @@ import android.util.Log
  * Плитка в шторке быстрых настроек.
  *
  * Нажатие переключает пресеты по кругу, рядом с иконкой показывается оставшееся
- * время; пока шторка открыта, значение обновляется каждую секунду.
+ * время, которое обновляется каждую секунду.
+ *
+ * Тикер работает всё время, пока SystemUI держит сервис привязанным (onCreate…onDestroy),
+ * а не только между onStartListening/onStopListening: на некоторых прошивках SystemUI
+ * зовёт onStopListening через несколько секунд при открытой шторке и отвязывает
+ * сервис лишь спустя ~30 с, из-за чего время на плитке «замирало».
  */
 class CaffeinateTileService : TileService() {
 
+    companion object {
+        private const val TAG = "CaffeinateTile"
+    }
+
     private val handler = Handler(Looper.getMainLooper())
-    private var listening = false
+    private var alive = false
 
     private val tick = object : Runnable {
         override fun run() {
             update()
-            if (listening && CaffeinateState.active && !CaffeinateState.isInfinite) {
+            if (alive && CaffeinateState.active && !CaffeinateState.isInfinite) {
                 // Следующее обновление — на границе секунды оставшегося времени.
                 val delay = (CaffeinateState.remainingMs() % 1000).let { if (it < 50) 1000 else it }
                 handler.postDelayed(this, delay)
@@ -34,17 +43,30 @@ class CaffeinateTileService : TileService() {
 
     private val stateListener: () -> Unit = { restartTicker() }
 
+    override fun onCreate() {
+        super.onCreate()
+        alive = true
+        Log.d(TAG, "onCreate")
+        CaffeinateState.addListener(stateListener)
+    }
+
+    override fun onDestroy() {
+        alive = false
+        Log.d(TAG, "onDestroy")
+        CaffeinateState.removeListener(stateListener)
+        handler.removeCallbacks(tick)
+        super.onDestroy()
+    }
+
     override fun onStartListening() {
         super.onStartListening()
-        listening = true
-        CaffeinateState.addListener(stateListener)
+        Log.d(TAG, "onStartListening")
         restartTicker()
     }
 
     override fun onStopListening() {
-        listening = false
-        CaffeinateState.removeListener(stateListener)
-        handler.removeCallbacks(tick)
+        // Тикер не останавливаем: см. комментарий к классу.
+        Log.d(TAG, "onStopListening")
         super.onStopListening()
     }
 
@@ -54,7 +76,7 @@ class CaffeinateTileService : TileService() {
             Controller.cycle(applicationContext)
         } catch (e: IllegalStateException) {
             // Например, ForegroundServiceStartNotAllowedException: запускаем через активити.
-            Log.w("Caffeinate", "cannot start service from tile", e)
+            Log.w(TAG, "cannot start service from tile", e)
             openApp(cycle = true)
         }
         update()
@@ -66,7 +88,11 @@ class CaffeinateTileService : TileService() {
     }
 
     private fun update() {
-        val tile = qsTile ?: return
+        val tile = try {
+            qsTile
+        } catch (e: RuntimeException) {
+            null
+        } ?: return
         val st = CaffeinateState
         val label: String
         val subtitle: String
