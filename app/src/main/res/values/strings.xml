@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Caffeinate</string>
+    <string name="xposed_description">Не даёт устройству уснуть и/или заблокироваться по таймеру. Хук SystemUI нужен для режима «не блокировать».</string>
+
+    <string name="mode_screen_on">Не выключать дисплей</string>
+    <string name="mode_no_lock">Не блокировать дисплей</string>
+    <string name="mode_both">Не выключать и не блокировать</string>
+
+    <string name="mode_screen_on_short">Экран вкл.</string>
+    <string name="mode_no_lock_short">Без блокировки</string>
+    <string name="mode_both_short">Экран вкл., без блокировки</string>
+
+    <string name="mode_screen_on_hint">Экран остаётся включённым, пока работает таймер.</string>
+    <string name="mode_no_lock_hint">Экран может погаснуть, но устройство не блокируется. Нужен активный модуль LSPosed (область: Системный интерфейс).</string>
+    <string name="mode_both_hint">Экран не гаснет, а если его выключить кнопкой, устройство не заблокируется.</string>
+
+    <string name="section_status">Состояние</string>
+    <string name="section_mode">Режим</string>
+    <string name="section_presets">Пресеты времени</string>
+    <string name="section_module">Модуль LSPosed</string>
+    <string name="section_tile">Плитка в шторке</string>
+
+    <string name="status_off">Выключено</string>
+    <string name="status_on">%1$s · осталось %2$s</string>
+    <string name="status_on_infinite">%1$s · без ограничения</string>
+
+    <string name="action_stop">Остановить</string>
+    <string name="action_start_first">Запустить: %1$s</string>
+    <string name="action_next">Следующий пресет</string>
+    <string name="action_add_preset">Добавить пресет</string>
+    <string name="action_reset_presets">Сбросить по умолчанию</string>
+    <string name="action_add_tile">Добавить плитку</string>
+    <string name="action_start">Старт</string>
+    <string name="action_delete">Удалить</string>
+
+    <string name="presets_hint">Нажатие на плитку переключает пресеты по кругу: выкл → первый → второй → … → выкл.</string>
+    <string name="presets_empty">Нет пресетов. Добавьте хотя бы один.</string>
+    <string name="preset_dialog_title">Новый пресет</string>
+    <string name="preset_dialog_hint">Минуты, «ч:мм» или 0 для бесконечности</string>
+    <string name="preset_invalid">Не удалось разобрать время</string>
+    <string name="preset_exists">Такой пресет уже есть</string>
+
+    <string name="module_active">Модуль активен: режим «не блокировать» работает через хук SystemUI.</string>
+    <string name="module_inactive">Модуль не активен. Включите его в LSPosed Manager (область: Системный интерфейс), затем перезапустите SystemUI или устройство. Без модуля «не блокировать» работает только при блокировке без пароля (свайп).</string>
+
+    <string name="tile_hint">Откройте шторку, нажмите «Изменить» и перетащите плитку Caffeinate. Долгое нажатие на плитку открывает эти настройки.</string>
+    <string name="tile_off">Выкл.</string>
+
+    <string name="notif_channel">Caffeinate активен</string>
+    <string name="notif_infinite">Без ограничения по времени</string>
+    <string name="notif_until">До %1$s</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+</resources>

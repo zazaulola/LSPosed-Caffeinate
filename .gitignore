@@ -28,3 +28,6 @@ keystore.properties
 *.log
 .DS_Store
 Thumbs.db
+
+# Общий debug-ключ: одинаковая подпись у всех сборок CI, чтобы APK ставился поверх.
+!app/debug.keystore
